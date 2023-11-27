@@ -1,9 +1,10 @@
 import NotFound from "./not-found";
-
+export const dynamicParams = true;
 async function fetchPost(postId) {
   const res = await fetch(
     `https://jsonplaceholder.typicode.com/posts/${postId}`,
-    { cache: "force-cache" }
+    // { cache: "force-cache" }
+    { next: { revalidate: 60 } }
   );
   const post = await res.json();
   return post;
@@ -30,4 +31,10 @@ export async function generateStaticParams() {
   return posts.slice(0, 4).map((post) => ({
     postId: post.id.toString(),
   }));
+}
+
+export async function generateMetadata({ params }) {
+  const product = await fetchPost(params.id);
+
+  return { title: product.title, description: product.body };
 }
